@@ -20,7 +20,7 @@
 > 
 > To get more information about Gravitational Wave, please see [GW-sources, LIGO](https://www.ligo.caltech.edu/page/gw-sources)
 
-## Available Class and Functions:
+## Available Classes and Functions:
 
 ### **class** `PurpleMicroStar.GravitationalWave.CBIGW()`
 
