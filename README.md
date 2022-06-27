@@ -1,13 +1,16 @@
-![PMS_logo_long](https://github.com/Airscker/Puple-Micro-Star/blob/main/imgs/PMS.png?raw=true)
+![PMS_logo_long](https://github.com/Airscker/Puple-Micro-Star/blob/Web/imgs/PMS.png?raw=true)
 
 # MultiBody Celestial Motion Simulation
 
 ## Introduction
 
-### This is a package build for simulating  Multibody Celestial motion and Gravitational Wave of Pulsars or Binary  Celestial Bodies.
+This is a package built for simulating Multibody Celestial motion and Gravitational Wave of Pulsars or Binary Celestial Bodies.
 
-
-
+To install this package just using `pip`:
+```
+pip install PupleMicroStar
+```
+And the document is available here at 
 
 
 ## Key Information
