@@ -9,11 +9,22 @@ import os
 import csv
 # import pyqtgraph as pg
 import pickle
-import BasicConst as BC
-import BasicMech as BMech
-import StarBody as Sbody
+import PurpleMicroStar.BasicConst as BC
+import PurpleMicroStar.BasicMech as BMech
+import PurpleMicroStar.StarBody as Sbody
 from prettytable import PrettyTable
 
+'''
+### This module is built for Multibody motion simulation
+
+@AUTHOR: Yufeng Wang
+@DATE: 2022-6
+@LICENSE: GPL-V3 license
+
+CopyRight (C) Yufeng-Wang/Airscker, 2022-6
+
+More information about this module please see: https://airscker.github.io/Purple-Micro-Star/
+'''
 
 class MultiBody:
     '''
@@ -52,13 +63,14 @@ class MultiBody:
                 [[[v1_t1],[v2_t1],[v3_t1]],
                  [[v1_t2],[v2_t2],[v3_t2]],...]
         '''
+        iterCount=int(iterCount)
         print('\n---Total time of motion: {}s, total iteration times: {}---\n'.format(iterCount*dt,iterCount))
         Pos_curve=[]
         Vel_curve=[]
         bar=tqdm(range(iterCount),mininterval=1)
+        bar.set_description('Calculating Multibody Motion Properties')
         mbody=self.mbody.copy()
         for iter in bar:
-            bar.set_description('Calculating Multibody Motion Properties at {}s'.format(round(iter*dt,5)))
             # Calculate their gravity force and roche_limit
             for i in range(len(mbody)):
                 mcopy=mbody.copy()
@@ -67,12 +79,12 @@ class MultiBody:
                 mbody[i].Roche_limit(mcopy)
                 
             # Delete Crashed Starbody
-            for j in range(len(mbody)):
-                for i in range(len(mbody)):
-                    if mbody[i].ad_prop['Roche_limit']/mbody[i].mass>=1:
-                        self.Crashed.append(mbody[i])
-                        mbody.pop(i)
-                        break
+            for i in range(len(mbody)):
+                if mbody[i].ad_prop['Roche_limit']/mbody[i].mass>=1:
+                    self.Crashed.append(mbody[i])
+                    print('---StarBody *{}* Crashed at Iteration *{}*---'.format(mbody[i].name,iter))
+                    mbody.pop(i)
+                    break
 
             # Iterate their motion information
             for i in range(len(mbody)):
@@ -130,6 +142,7 @@ class MultiBody:
         return Pos_curve,Vel_curve
     def Dataset(self,datapath='.\\exampledata\\Multibody.csv',datasep=','):
         '''
+        ## Load MultiBody From Given formated Dataset .csv file
         ### Parameters:
         - datapath: the csv data root path of planets' basic data
         - datasep: the seperation of every information
@@ -145,8 +158,9 @@ class MultiBody:
         try:
             self.data=pd.read_csv(datapath,sep=datasep)
         except:
-            print('Check the data file path!')
-            return None,None
+            print('\n---No MultiBody data read, Check the data file path!---\n')
+            exit()
+            # return None,None
         body=[]
         # create starbody objects
         try:
@@ -172,7 +186,13 @@ class MultiBody:
                 position='.\\exampledata\\Curve_data\\Multibody_3_Iter_100_dt_10_Position.pkl',
                 velocity='.\\exampledata\\Curve_data\\Multibody_3_Iter_100_dt_10_Velocity.pkl'):
         '''
-        ## Rebuild your planet cluster using data files saved by Iteration(), make sure you haven't changed anything of these data, you just need to find the cooresponding filename
+        ## Rebuild your planet cluster using data files saved by Iteration(), make sure you haven't changed anything of these data, you just need to find the cooresponding filenames
+        ### Parameters:
+        - body: the $body_Rebuild.csv path
+        - position: the $Position.csv path
+        - Velocity: the $Velocity.csv path
+        ### Return:
+        - The list of position curve data, The list of the velocity curve data, The list of Object 
         '''
         # Get basic body info
         body_data=pd.read_csv(body)
@@ -237,7 +257,8 @@ class MultiBody:
         for i in range(len(body_x)):
             ax.plot3D(body_x[i],body_y[i],body_z[i],label=self.mbody[i].name)
         for i in range(self.pos_data[-1].shape[0]):
-            ax.scatter3D(self.pos_data[-1][i][0],self.pos_data[-1][i][1],self.pos_data[-1][i][2],s=100*self.mbody[i].Radius/BC.R_earth)
+            ax.scatter3D(self.pos_data[-1][i][0],self.pos_data[-1][i][1],self.pos_data[-1][i][2],s=200*self.mbody[i].Radius/BC.R_earth)
+        label=[]
         ax.legend()
         plt.show()
         return [body_x,body_y,body_z]
@@ -246,52 +267,3 @@ class MultiBody:
 
 
     
-
-
-# a=MultiBody()
-# a.Dataset(datapath='.\\exampledata\\Multibody-3.csv',datasep=',')
-# print(a)
-# p,v =a.Iteration(dt=100,iterCount=int(1e3))
-# a.Plot()
-# # print(p[-1].shape)
-# print(a.mbody[2])
-
-
-# p1,v1,pn1,vn1,manybody=a.Rebuild()
-# print(manybody[0])
-# print(p1.shape)
-# pg.plot(p)
-# print(p)
-# print(p.shape)
-# print(v1)
-# print(manybody[0])
-
-
-# plt.imshow(pn)
-# plt.show()
-# p1,v1,pn1,vn1=a.Rebuild()
-# print(np.max(p1-p),np.min(p1-p))
-# print(pn1)
-# print(np.max(pn1-pn),np.min(pn1-pn))
-# plt.imshow(pn1)
-# plt.show()
-# print(p.shape)
-# print(p)
-# print(a.data)
-
-# p_norm=p-np.min(p)
-# p_norm=p_norm/np.max(p_norm)
-# print(np.min(p_norm),np.max(p_norm))
-# plt.imshow(p_norm)
-# plt.show()
-
-# print(a.data.iloc[0][0])
-# print(a.data.columns[0])
-# print(a.data.shape)
-# print(a.mbody[0])
-# print(a.Iteration())
-# print(a.mbody[0])
-# print(a.data['Name'][0])
-
-# b=Sbody.StarBody()
-# print(b)

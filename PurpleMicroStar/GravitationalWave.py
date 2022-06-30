@@ -15,7 +15,7 @@ LIGO scientists have defined four categories of gravitational waves based on wha
 - Burst
 
 Each category of objects generates a unique or characteristic set of signal that interferometers can sense,
-but not all types of Gravitational Wave can be simulated numerically. This module simulate the gravitational wave of *Compact Binary Inspiral Gravitational Wave*
+but not all types of Gravitational Wave can be simulated numerically. This module simulate the gravitational wave of *Compact Binary Inspiral Gravitational Wave* and *Continuous Gravitational Wave*
 
 More information about this please see: https://www.ligo.caltech.edu/page/gw-sources
 
@@ -24,12 +24,14 @@ More information about this please see: https://www.ligo.caltech.edu/page/gw-sou
 @LICENSE: GPL-V3 license
 
 CopyRight (C) Yufeng-Wang/Airscker, 2022-6
+
+More information about this module please see: https://airscker.github.io/Purple-Micro-Star/
 '''
 import pickle as pkl
-import MultiBody as MB
-import StarBody as SB
-import BasicConst as BC
-import BasicMech as BMech
+import PurpleMicroStar.MultiBody as MB
+import PurpleMicroStar.StarBody as SB
+import PurpleMicroStar.BasicConst as BC
+import PurpleMicroStar.BasicMech as BMech
 import numpy as np
 import math
 import prettytable as PT
@@ -145,7 +147,7 @@ class CBIGW:
         - T_now: the time at the place of observation
         
         ### Return:
-            The Gravitational Wave Field(scalar)
+            The Detected Gravitational Wave Field Signal(scalar)
         '''
         if T_now>self.Coalescence_time:
             print('---Coalescence Time {}s Reached!, Current Time: {}s---'.format(self.Coalescence_time,T_now))
@@ -171,7 +173,7 @@ class CBIGW:
         else:
             print('---Coalescence Time {}s Reached!, Current Time: {}s---'.format(self.Coalescence_time,T_now))
             return 0
-    def DATA(self,Dt=0.1,T_init=0,T_end=10,Obser_R=[1e3,1e3,1e3],imgoutput='',Plot=True):
+    def DATA(self,Dt=0.01,T_init=0,T_end=10,Obser_R=[1e3,1e3,1e3],imgoutput='',Plot=True):
         '''
         ## Plot data of Gravitational wave
         ### Parameters:
@@ -179,6 +181,8 @@ class CBIGW:
         - T_init: the start time of data
         - T_end: the end time of data
         - Obser_R: the position vector of the observer
+        - imgoutput: the folder to save the ploted image, if it's empty, no image will be saved
+        - Plot: plot the data curve
         '''
         # Prepare the data
         dis=[]
@@ -247,7 +251,7 @@ class CBIGW:
         if Plot==True:
             plt.show()# DONOT put plt.show() in front of plt.savefig!!!
         return dis,grav,signal,phase
-    def SaveData(self,Dt=0.1,T_init=0,T_end=10,Obser_R=[1e3,1e3,1e3],output=''):
+    def __SaveData(self,Dt=0.1,T_init=0,T_end=10,Obser_R=[1e3,1e3,1e3],output=''):
         # # save the data
         # if output!='':
         #     try:
@@ -260,7 +264,24 @@ class CBIGW:
         #     print('---Data saved as {}---'.format(path))
         pass
 
-class CWW(SB.StarBody):
+class CGW(SB.StarBody):
+    '''
+    # Continuous gravitational waves
+    Continuous gravitational waves are thought to be produced by a single spinning massive object like a neutron star. 
+    Any bumps on or imperfections in the spherical shape of this star will generate gravitational waves as it spins. 
+    If the spin-rate of the star stays constant, so too are the gravitational waves it emits. 
+    That is, the gravitational wave is continuously the same frequency and amplitude (like a singer holding a single note). 
+    That's why these are called “Continuous Gravitational Waves”.
+    ### Parameters:
+    - Mass: the mass of the pulsar
+    - Radius: the radius of the pulsar
+    - Spin: the saclar spin speed of the planet, in rad/s, the spin will be automatically aligned to z-axis
+    - Name: the name of the pulsar
+    - Meg: the megnatic dipole of the pulsar
+    - RotI: the rotation inertia of the pulsar
+
+    All parameters meet SI standard.
+    '''
     def __init__(self,Name='PulsarAX01',Mass=1e5*BC.M_sun,Radius=1e-3*BC.R_earth,Spin=1,Meg=[1e3,1e3,1e3],RotI=[1.1,0.9,1.2]):
         super().__init__(Position=[0,0,0],Velocity=[0,0,0],Mass=Mass,Radius=Radius,Spin=[0,0,Spin],Name=Name)
         if BMech.Vec_Length(self.spin)>self.ad_prop['Max_spin']:
@@ -292,15 +313,15 @@ class CWW(SB.StarBody):
                         ['Maximum Spin Velocity(rad/s)',self.ad_prop['Max_spin']]])
         print(str3)
         print(str4)
-        str5=('\n---Sphere Model Properties of the StarBody {}---\n'.format(self.name))
-        str6=PT.PrettyTable()
-        str6.field_names=['Properties','Value']
-        str6.add_rows([['Sphere Model Data shape',self.Sphere.shape],
-                        ['2nd-Index of the Sphere Center Plane',(self.Sphere.shape[1]-1)/2],
-                        ['Segmentation D_Angle(degree)',self.DAngle],
-                        ['Outer Sphere Radius(m)',self.Radius]])
-        print(str5)
-        print(str6)
+        # str5=('\n---Sphere Model Properties of the StarBody {}---\n'.format(self.name))
+        # str6=PT.PrettyTable()
+        # str6.field_names=['Properties','Value']
+        # str6.add_rows([['Sphere Model Data shape',self.Sphere.shape],
+        #                 ['2nd-Index of the Sphere Center Plane',(self.Sphere.shape[1]-1)/2],
+        #                 ['Segmentation D_Angle(degree)',self.DAngle],
+        #                 ['Outer Sphere Radius(m)',self.Radius]])
+        # print(str5)
+        # print(str6)
         str7='---More are available because of your exploration! And all properties meet SI standard---\n'
         
         return str7
@@ -345,7 +366,7 @@ class CWW(SB.StarBody):
         - T_now: the time at the place of observation
         
         ### Return:
-            The Polarized Gravitational Wave Field, [h+,hx]
+            The Detected Polarized Gravitational Wave Field, [h+,hx]
         '''
         i=BMech.Vec_Angle(Obser_R,self.spin)
         w=self.GWSpin(T_now=T_now)[2]
@@ -423,45 +444,3 @@ def Orbit_spin(m1,m2,Distance):
 def Schwarz_Radius(m):
     return 2*BC.G*m/BC.c**2
 
-
-# bh1=CWW()
-# bh1.DATA()
-# a=[]
-# b=[]
-# for i in range(int(1e4)):
-#     a.append(bh1.Detect_Signal(T_now=i*10)[0])
-#     b.append(bh1.Detect_Signal(T_now=i*10)[1])
-
-
-# print(np.array(bh1.Detect_Signal()).shape)
-
-# a=np.array(a)
-# plt.plot(b)
-# plt.plot(a)
-# img=plt.imread(r'E:\OneDrive - USTC\Python\Python_Basic\LEVEL4\Figure_5.png')
-# plt.axis('off')
-# plt.imshow(img)
-# plt.savefig('good.png',bbox_inches='tight',pad_inches=0)
-# plt.show()
-# plt.clf()
-
-# bhs1=CBIGW()
-# bhs1.DATA(T_init=341,T_end=bhs1.Coalescence_time,Dt=0.001,imgoutput='MultiGravity\CBIG_DATA')
-# plt.figure()
-# d=[]
-# tt=10000
-# for i in range(int(tt)):
-#     # d.append(BMech.Vec_Length(bhs1.Grav_Wave(T_now=i)))
-#     d.append(bhs1.Detect_Signal(T_now=i*0.001))
-#     # d.append(np.sin(bhs1.Orbit_Phase(T_now=i)))
-# plt.plot(np.array(range(int(tt))),np.array(d))
-# plt.show()
-# print(bhs1.Grav_Wave())
-# print(bhs1.Distance())
-# print(bhs1.DEnergy_Loss())
-# print(bhs1)
-# print(bhs1.Detect_Signal())
-# print(bhs1.Orbit_Phase())
-# print(BMech.Rotate_XYZ(rad=np.deg2rad(BMech.AngleXYZ([1,1,-1]))))
-# print(BMech.Vec_Angle([1,1,-1],[0,1,0]))
-# print(np.array([[1,0,0],[0,np.sin(1),-np.sin(1)],[0,np.sin(1),np.cos[1]]]))

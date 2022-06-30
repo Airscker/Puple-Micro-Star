@@ -22,6 +22,16 @@
         R_sun=696300000\n    
     Spin of planets:\n
         S_earth=[0,0,7.292e-5]\n
+    permeability:\n
+        mu0=4*math.pi*1e-7
+
+@AUTHOR: Yufeng Wang
+@DATE: 2022-6
+@LICENSE: GPL-V3 license
+
+CopyRight (C) Yufeng-Wang/Airscker, 2022-6
+
+More information about this module please see: https://airscker.github.io/Purple-Micro-Star/
 '''
 
 import math

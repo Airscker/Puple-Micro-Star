@@ -1,6 +1,16 @@
 import numpy as np
-import BasicConst as BC
+import PurpleMicroStar.BasicConst as BC
+'''
+### This module contains some basic mathematical and physical algorithms
 
+@AUTHOR: Yufeng Wang
+@DATE: 2022-6
+@LICENSE: GPL-V3 license
+
+CopyRight (C) Yufeng-Wang/Airscker, 2022-6
+
+More information about this module please see: https://airscker.github.io/Purple-Micro-Star/
+'''
 
 def G_Force(m1=1,m2=1,pos1=[0,0,0],pos2=[1,1,1]):
     '''
@@ -54,6 +64,8 @@ def AngleXYZ(vec,plane='XY'):
     ## Get the angle between the vector and specified plane
     ### Parameters:
         plane: XY,YZ,XZ available
+    ### Return:
+        The angle in degree
     '''
     vec_c=vec.copy()
     plus=1
@@ -98,5 +110,3 @@ def Rotate_XYZ(vec=[1,1,-1],rad=0.1,Axis='X'):
         Rotate=np.array([[np.cos(rad),-np.sin(rad),0],[np.sin(rad),np.cos(rad),0],[0,0,1]])
 
     return np.dot(Rotate,np.array(vec))
-
-# print(Vec_Length())

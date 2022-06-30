@@ -1,5 +1,5 @@
-import BasicConst as BC
-import BasicMech as BMech
+import PurpleMicroStar.BasicConst as BC
+import PurpleMicroStar.BasicMech as BMech
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle as pkl
@@ -7,6 +7,18 @@ import math
 import os
 import prettytable as PT
 from tqdm import tqdm
+
+'''
+### This module is built for simulating single celestial body, as well as calculating basic properties
+
+@AUTHOR: Yufeng Wang
+@DATE: 2022-6
+@LICENSE: GPL-V3 license
+
+CopyRight (C) Yufeng-Wang/Airscker, 2022-6
+
+More information about this module please see: https://airscker.github.io/Purple-Micro-Star/
+'''
 
 class StarBody():
     '''
@@ -118,6 +130,7 @@ class StarBody():
         - dt: the time period per motion used
         - iterCount: the iteration times of dt
         '''
+        iterCount=int(iterCount)
         if self.ad_prop['Roche_limit']/self.mass<1:
             self.iter+=iterCount
             self.Ctime+=iterCount*dt
@@ -140,7 +153,7 @@ class StarBody():
             sum+=(manybody[i].mass*2*self.Radius**3)/(math.sqrt(np.sum(self.pos-manybody[i].pos)**2))**3
         self.ad_prop['Roche_limit']=sum
         return sum
-    def SphereModel(self,DAngle=0.1):
+    def __SphereModel(self,DAngle=0.1):
         '''
         ### Parameters:
         - DAngle: the angle between nearby points
@@ -171,7 +184,7 @@ class StarBody():
                 Y.insert(0,-y)
         self.Sphere=np.array([X,Y])
         return self.Sphere
-    def SaveSphereModel(self,output=''):
+    def __SaveSphereModel(self,output=''):
         if output!='':
             try:
                 os.makedirs(output)
@@ -185,9 +198,4 @@ class StarBody():
         return path
 
 
-# s1=StarBody()
-# print(s1)
-# s1.SphereModel()
-# s1.SaveSphereModel(output='.\\SphereModels')
-# print(s1)
 
